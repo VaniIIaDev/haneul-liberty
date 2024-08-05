@@ -1,0 +1,588 @@
+<style>
+body {
+    --liberty-brand-color: {{ config.getString('skin.liberty.brand_color_1') || '#4188f1' }};
+    --liberty-brand-dark-color: {{ config.getString('skin.liberty.brand_dark_color_1') || '#214479' }};
+    --liberty-brand-bright-color: {{ config.getString('skin.liberty.brand_bright_color_1') || '#a0c4f8' }};
+    --liberty-navbar-logo-image: {{ config.getString('skin.liberty.navbar_logo_image') || 'none' }};
+    --liberty-navbar-logo-minimum-width: {{ config.getString('skin.liberty.navbar_logo_minimum_width') || '5rem' }};
+    --liberty-navbar-logo-width: {{ config.getString('skin.liberty.navbar_logo_width') || '6.6rem' }};
+    --liberty-navbar-logo-size: {{ config.getString('skin.liberty.navbar_logo_size') || '1.9rem' }};
+    --liberty-navbar-logo-padding: {{ config.getString('skin.liberty.navbar_logo_padding') || '0' }};
+    --liberty-navbar-logo-margin: {{ config.getString('skin.liberty.navbar_logo_margin') || '0' }};
+    --brand-color-1: var(--liberty-brand-color);
+    --brand-color-2: {{ config.getString('skin.liberty.brand_color_2') || 'var(--liberty-brand-color)' }};
+    --brand-bright-color-1: var(--liberty-brand-bright-color);
+    --brand-bright-color-2: {{ config.getString('skin.liberty.brand_bright_color_2') || 'var(--liberty-brand-bright-color)' }};
+    --text-color: '#373a3c';
+    --article-background-color: '#f5f5f5';
+}
+
+body.theseed-dark-mode {
+    --liberty-brand-color: '#2d2f34';
+    --liberty-brand-dark-color: '#16171a';
+    --liberty-brand-bright-color: '#383b40';
+    --brand-color-1: var(--liberty-brand-color);
+    --brand-color-2: var(--liberty-brand-color);
+    --brand-bright-color-1: var(--liberty-brand-bright-color);
+    --brand-bright-color-2: var(--liberty-brand-bright-color);
+    --text-color: '#ddd';
+    --article-background-color: '#000';
+}
+
+.hidden {
+    display: none;
+}
+
+</style>
+<script>
+function onClickEditBtn(route) {
+    if ($('#editable').css('display') == 'block') {
+        location.href = `/${route}/{{ document|encode_doc }}`;
+    }
+    else {
+        $('#editable').show();
+    }
+    return false;
+}
+
+var block_log = "{{ document.namespace }}:{{ document.title }} r{{ max_rev }} 긴급차단"
+
+</script>
+<div class="Liberty">
+    <div id="top"></div>
+    <link rel="shortcut icon" href="/skins/liberty/static/img/favicon.ico">
+    <div class="nav-wrapper">
+        <nav class="navbar navbar-dark">
+            <a class="navbar-brand" href="/">{{ config.getString('skin.liberty.navbar_logo_text') }}</a>
+            <ul class="nav navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/RecentChanges"><span class="fa fa-compass" style="font-size: 17px;"></span><span class="hide-title">최근 변경</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/RecentDiscuss"><span class="fa fa-commenting"></span><span class="hide-title">최근 토론</span></a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle dropdown-toggle-fix" href="#" data-toggle="dropdown" aria-expanded="false">
+                        <span class="fa fa-wrench"></span><span class="hide-title">도구</span>
+                    </a>
+                    <div class="dropdown-menu" role="menu">
+                        <div class="dr-admin" style="margin-top: 5px;"><b>엔진 도구</b></div>
+                        <div class="dropdown-divider"></div>
+                        <a href="/UpdateLog" class="dropdown-item"><span class="fa fa-info-circle"></span> 업데이트 내역 & 안내</a>
+                        <a href="/License" class="dropdown-item"><span class="fa fa-copyright"></span> 라이선스</a>
+                        {% if perms.has('developer') %}
+                            <a href="/admin/owner_tools" class="dropdown-item"><span class="fa fa-gears"></span> 소유자 도구</a>
+                            <a href="/admin/config" class="dropdown-item"><span class="fa fa-gear"></span> 환경설정</a>
+                        {% endif %}
+                        <div class="dropdown-divider"></div>
+                        <a href="/Help" class="dropdown-item"><span class="fa fa-question-circle"></span> 도움말</a>
+                        <div class="dropdown-divider"></div>
+                        <div class="dr-admin" style="margin-top: 5px;"><b>일반 도구</b></div>
+                        <div class="dropdown-divider"></div>
+                        <a href="/NeededPages" class="dropdown-item"><span class="fa fa-minus-circle"></span> 작성이 필요한 문서</a>
+                        <a href="/OrphanedPages" class="dropdown-item"><span class="fa fa-exclamation-triangle"></span> 고립된 문서</a>
+                        <a href="/UncategorizedPages" class="dropdown-item"><span class="fa fa-list"></span> 분류가 되지 않은 문서</a>
+                        <a href="/OldPages" class="dropdown-item"><span class="fa fa-undo"></span> 편집된 지 오래된 문서</a>
+                        <a href="/ShortestPages" class="dropdown-item"><span class="fa fa-thumbs-down"></span> 내용이 짧은 문서</a>
+                        <a href="/LongestPages" class="dropdown-item"><span class="fa fa-thumbs-up"></span> 내용이 긴 문서</a>
+                        <a href="/list" class="dropdown-item"><span class="fa fa-star"></span> 문서 목록</a>
+                        <a href="/BlockHistory" class="dropdown-item"><span class="fa fa-ban"></span> 차단 내역</a>
+                        <a href="/RandomPage" class="dropdown-item"><span class="fa fa-reply"></span> RandomPage</a>
+                        <!-- <a href="/Upload" class="dropdown-item">파일 올리기</a> -->
+                        {% if perms.has('grant','login_history','aclgroup','ipacl','suspend_account','developer') %}
+                            <div class="dropdown-divider"></div>
+                            <div class="dr-admin"><b>권한 도구</b></div>
+                            <div class="dropdown-divider"></div>
+                        {% endif %}
+                        {% if perms.has('ipacl') %}
+                            <a href="/admin/ipacl" class="dropdown-item">IPACL</a>
+                        {% endif %}
+                        {% if perms.has('suspend_account') %}
+                            <a href="/admin/suspend_account" class="dropdown-item">계정 차단</a>
+                        {% endif %}
+                        {% if perms.has('grant') %}
+                            <a href="/admin/grant" class="dropdown-item"><span class="fa fa-user-plus"></span> 권한</a>
+                        {% endif %}
+                        {% if perms.has('aclgroup') %}
+                            <a href="/aclgroup" class="dropdown-item"><span class="fa fa-user-times"></span> ACL Group</a>
+                        {% endif %}
+			{% if perms.has('batch_revert') %}
+			    <a href="/admin/batch_revert" class="dropdown-item"><span class="fa fa-refresh"></span> 일괄 되돌리기</a>
+			{% endif %}
+            {% if perms.has('super_admin') %}
+                <div class="dropdown-divider"></div>
+                <div class="dr-admin"><b>관리 도구</b></div>
+                <div class="dropdown-divider"></div>
+                <a href="/admin/super_admin_tools" class="dropdown-item"><span class="fa fa-ellipsis-h"></span> 정식 관리자 도구</a>
+                {% if perms.has('login_history') %}
+                    <a href="/admin/login_history" class="dropdown-item"><span class="fa fa-search"></span> 로그인 기록 조회</a>
+                {% endif %}
+			    <a href="/admin/verify_user" class="dropdown-item"><span class="fa fa-check-circle"></span> 사용자 인증</a>
+                <a href="/admin/hide_profile" class="dropdown-item"><span class="fa fa-image"></span> 프로필 사진 숨기기</a>
+			{% endif %}
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="//board.haneul.wiki"><span class="fa fa-pencil"></span><span class="hide-title">게시판</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/Upload"><span class="fa fa-cloud-upload"></span><span class="hide-title">파일 올리기</span></a>
+                </li>
+                <!-- <li class="nav-item"> -->
+                    <!-- <a class="nav-link" href="/random"><span class="fa fa-random"></span><span class="hide-title">임의 문서</span></a> -->
+                <!-- </li> -->
+            </ul>
+            <div class="navbar-login">
+                {% if member %}
+                    <div class="dropdown login-menu">
+                        <a id="login-menu" class="dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="fa fa-bell" style="
+                                font-size: 16px;
+                                margin-right: 5px;
+                                float: left;
+                            "></span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right login-dropdown-menu login-dropdown-menu-2" aria-labelledby="login-menu">
+                            <div class="username dropdown-item">
+                                <b>사용자 알림</b>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            {% for alert in alerts %}
+                                <div class="alert-entry">
+                                    <small>{{ alert.time|safe }}</small><br>
+                                    {{ alert.username|safe }} 님이 사용자님을 멘션했습니다.<br>
+                                    {{ alert.content|safe }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+                {% if member %}
+                    <div class="dropdown login-menu">
+                        <a id="login-menu" class="dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img class="profile-img" src="{{ member|avatar_url }}">
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right login-dropdown-menu" aria-labelledby="login-menu">
+                            <div class="username dropdown-item">
+                                <b>{{ member.username }}</b><br>Member
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a href="/settings" class="dropdown-item">설정</a>
+                            <a id="theme" href="#" class="dropdown-item">다크 테마로</a>
+                            <div class="dropdown-divider"></div>
+                            <a href="/member/mypage" class="dropdown-item">내 정보</a>
+                            <a href="/w/{{ member.username | encode_userdoc }}" class="dropdown-item">내 사용자 문서</a>
+                            <a href="/member/starred_documents" class="dropdown-item">내 문서함</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/contribution/author/{{ member.username }}/document">내 문서 기여 목록</a>
+                            <a class="dropdown-item" href="/contribution/author/{{ member.username }}/discuss">내 토론 기여 목록</a>
+                            <div class="dropdown-divider"></div>
+                            <a href="/member/logout?redirect={{ url | url_encode }}" class="dropdown-item">로그아웃</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="dropdown login-menu">
+                        <a id="login-menu" class="dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="fa fa-user"></span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right login-dropdown-menu">
+                            <div class="username dropdown-item">
+                                <b>{{ req_ip }}</b><br>Please login!
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a id="theme" href="#" class="dropdown-item">다크 테마로</a>
+                            <div class="dropdown-divider"></div>
+                            <a href="/contribution/ip/{{ req_ip }}/document" class="dropdown-item">내 문서 기여 목록</a>
+                            <a href="/contribution/ip/{{ req_ip }}/discuss" class="dropdown-item">내 토론 기여 목록</a>
+                            <div class="dropdown-divider"></div>
+                            <a href="/member/login?redirect={{ url | url_encode }}" class="dropdown-item">로그인</a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            <form id="searchform" class="form-inline">
+                <div class="input-group">
+                    <span class="input-group-btn">
+                        <button onClick="location.href='/random'" style="border-color: #fff; border-width: 2px; border-radius: 10px; margin-right: 5px; background-color: var(--liberty-brand-color)" class="btn btn-secondary"><span style="color: #fff; height: 13.5px;" class="fa fa-random"></span></button>
+                    </span>
+                    <input type="search" name="q" placeholder="여기에서 검색" accesskey="f" class="form-control" id="searchInput" autocomplete="off">
+                    <span class="input-group-btn">
+                        <button type="submit" name="fulltext" value="검색" id="searchSearchButton" class="btn btn-secondary"><span class="fa fa-search"></span></button>
+                        <button type="submit" name="go" value="보기" id="searchGoButton" class="btn btn-secondary"><span class="fa fa-arrow-right"></span></button>
+                    </span>
+                </div>
+            </form>
+        </nav>
+    </div>
+    <div class="content-wrapper">
+        <div class="liberty-sidebar">
+            <div class="liberty-right-fixed">
+                {% if member %}
+                    <div class="live-recent" style="margin-bottom: 20px;">
+                        <div class="live-recent-header">
+                            <ul class="nav nav-tabs">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="liberty-recent-tab1" style="font-size: 1.2rem; font-weight: 700; text-align: left;">사용자</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="live-recent-content" style="height: 110px; border-bottom-left-radius: 0.35rem; border-bottom-right-radius: 0.35rem;">
+                            <div class="pr10">
+                                <div class="pr11">
+                                    <img class="profile-img" src="{{ member|avatar_url }}">
+                                </div>
+                                <div class="pr12">
+                                    <b>{{ member.username }}</b><br />
+                                    <small style="color: grey;">로그인 사용자</small>
+                                </div>
+                            </div>
+                            <div class="pr13" style="color: grey">
+                                <a href="/w/{{ member.username | encode_userdoc }}">
+                                    <i class="fa fa-file-text-o" style="color: grey;"></i> <span class="pr13-text" style="color: grey;">내 사용자 문서</span>
+                                </a>
+                                <a href="/member/mypage">
+                                    <i class="fa fa-gear pr13-icon2" style="color: grey;"></i> <span class="pr13-text" style="color: grey;">사용자 설정</span>
+                                </a>
+                                <a href="/member/logout">
+                                    <i class="fa fa-sign-out pr13-icon2" style="color: grey;"></i> <span class="pr13-text" style="color: grey;">로그아웃</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="live-recent" style="margin-bottom: 20px;">
+                        <div class="live-recent-header">
+                            <ul class="nav nav-tabs">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="liberty-recent-tab1" style="font-size: 1.2rem; font-weight: 700; text-align: left;">사용자</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="live-recent-content" style="height: 100px; border-bottom-left-radius: 0.35rem; border-bottom-right-radius: 0.35rem;">
+                            <div class="pr10">
+                                <div class="pr11">
+                                    <i class="fa fa-user pr11-ip-icon"></i>
+                                </div>
+                                <div class="pr12">
+                                    <b>{{ req_ip }}</b><br />
+                                    <small style="color: grey;">IP 사용자</small>
+                                </div>
+                            </div>
+                            <div class="pr13" style="color: grey">
+                                <a href="/member/login">
+                                    <i class="fa fa-sign-in" style="color: grey;"></i> <span class="pr13-text" style="color: grey;">로그인</span>
+                                </a>
+                                <a href="/member/signup">
+                                    <i class="fa fa-user pr13-icon2" style="color: grey;"></i> <span class="pr13-text" style="color: grey;">회원가입</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="live-recent" style="margin-bottom: 20px;">
+                    <div class="live-recent-header">
+                        <ul class="nav nav-tabs">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="liberty-recent-tab1" style="font-size: 1.2rem; font-weight: 700; text-align: left;">도움말</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="live-recent-content" style="height: 110px; border-bottom-left-radius: 0.35rem; border-bottom-right-radius: 0.35rem;">
+                        <div class="pr10" style="height: 70%;">
+                            <i class="fa fa-question-circle pr11-ip-icon" style="padding: 0.2rem 0.6rem;"></i>
+                            <div class="pr14">
+                                {% if member %}
+                                    <b>{{ member.username }}님, 하늘위키에 처음 오셨나요?</b>
+                                {% else %}
+                                    <b>{{ req_ip }}님, 하늘위키에 처음 오셨나요?</b>
+                                {% endif %}
+                                <br /><small style="color: grey;">이 문서들을 통해 하늘위키 사용법을 익혀보세요!</small>
+                            </div>
+                        </div>
+                        <div class="pr13" style="color: grey">
+                            <a href="/w/{{ '하늘위키:도움말'|encode_doc }}">
+                                <i class="fa fa-question-circle" style="color: grey;"></i> <span class="pr13-text" style="color: grey;">하늘위키:도움말</span>
+                            </a>
+                            <a href="/w/{{ '하늘위키:문법 도움말'|encode_doc }}">
+                                <i class="fa fa-pencil pr13-icon2" style="color: grey;"></i> <span class="pr13-text" style="color: grey;">하늘위키:문법 도움말</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="live-recent" style="margin-bottom: 20px;">
+                    <div class="live-recent-header">
+                        <ul class="nav nav-tabs">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="liberty-recent-tab1" style="font-size: 1.2rem; font-weight: 700; text-align: left;">최근 변경<span class="fa fa-angle-right" style="margin-top: 2px;float: right; font-size: 1.2rem; font-weight: 900;"></span></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="live-recent-content" style="border-bottom-left-radius: 0.35rem; border-bottom-right-radius: 0.35rem;">
+                        <ul class="live-recent-list" id="live-recent-list">
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="live-recent" style="margin-bottom: 20px;">
+                    <div class="live-recent-header">
+                        <ul class="nav nav-tabs">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="liberty-recent-tab1" style="font-size: 1.2rem; font-weight: 700; text-align: left;">최근 토론<span class="fa fa-angle-right" style="margin-top: 2px;float: right; font-size: 1.2rem; font-weight: 900;"></span></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="live-recent-content" style="border-bottom-left-radius: 0.35rem; border-bottom-right-radius: 0.35rem;">
+                        <ul class="live-recent-list" id="live-recent-discuss-list">
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="live-recent" style="margin-bottom: 20px;">
+                    <div class="live-recent-header">
+                        <ul class="nav nav-tabs">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="liberty-recent-tab1" style="font-size: 1.2rem; font-weight: 700; text-align: left;">연합 최근 변경<span class="fa fa-angle-right" style="margin-top: 2px;float: right; font-size: 1.2rem; font-weight: 900;"></span></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="live-recent-content" style="border-bottom-left-radius: 0.35rem; border-bottom-right-radius: 0.35rem;">
+                        <ul class="live-recent-list" id="live-recent-list-2">
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                            <li><span class="recent-item">&nbsp;</span></li>
+                        </ul>
+                    </div>
+                </div>          
+            </div>
+        </div>
+        <div class="container-fluid liberty-content">
+            {% if config.getString('wiki.sitenotice', null) %}
+            <div id="site-notice" class="alert alert-info">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <span><b>[<span class="fa fa-bullhorn"></span> 공지]</b> {{ config.getString('wiki.sitenotice', null)|safe }}</span>
+            </div>
+            {% endif %}
+            <div class="liberty-content-header">
+                {% if document %}
+                    <div class="content-tools">
+                        <div class="btn-group" role="group" aria-label="content-tools">
+                            {% if skinInfo.viewName == 'wiki' || skinInfo.viewName == 'notfound' %}
+                                {% if starred %}
+                                    <a href="/member/unstar/{{ document|encode_doc }}" class="btn btn-secondary tools-btn">
+                                        <span class="fa fa-star"></span>
+                                        <span class="star-count">{{ star_count }}</span>
+                                    </a>
+                                {% elseif star_count || star_count === 0 %}
+                                    <a href="/member/star/{{ document|encode_doc }}" class="btn btn-secondary tools-btn">
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="star-count">{{ star_count }}</span>
+                                    </a>
+                                {% endif %}
+                                    <a href="/backlink/{{ document|encode_doc }}" class="btn btn-secondary tools-btn"><span class="fa fa-anchor"></span> 역링크</a>
+                                {% if discuss_progress %}
+                                    <a href="/discuss/{{ document|encode_doc }}" class="btn btn-secondary btn-discuss-progress tools-btn"><span class="fa fa-commenting"></span> 토론</a>
+                                {% else %}
+                                    <a href="/discuss/{{ document|encode_doc }}" class="btn btn-secondary tools-btn"><span class="fa fa-comment"></span> 토론</a>
+                                {% endif %}
+                                {% if editable === true && edit_acl_message %}
+                                    <a href="#" onclick="onClickEditBtn('new_edit_request')" class="btn btn-secondary tools-btn"><span class="fa fa-pencil-square"></span> 편집 요청</a>
+                                {% elseif editable === false && edit_acl_message %}
+                                    <a href="#" onclick="onClickEditBtn('edit')" class="btn btn-secondary tools-btn"><span class="fa fa-lock"></span> 편집</a>
+                                {% else %}
+                                    <a href="/edit/{{ document|encode_doc }}" class="btn btn-secondary tools-btn"><span class="fa fa-edit"></span> 편집</a>
+                                {% endif %}
+                                {% if rev %}
+                                    <a href="/history/{{ document|encode_doc }}?from={{ rev }}" class="btn btn-secondary tools-btn"><span class="fa fa-history"></span> 역사</a>
+                                {% else %}
+                                    <a href="/history/{{ document|encode_doc }}" class="btn btn-secondary tools-btn"><span class="fa fa-history"></span> 역사</a>
+                                {% endif %}
+                                <a href="/acl/{{ document|encode_doc }}" class="btn btn-secondary tools-btn"><span class="fa fa-shield"></span> ACL</a>
+                                <button type="button" class="btn btn-secondary tools-btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    <span class="caret"></span>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right" role="menu">
+                                    {% if user %}
+                                        <a href="/contribution/author/{{ document.title|url_encode }}/document" class="dropdown-item">기여 내역</a>
+                                    {% endif %}
+                                    {% if rev %}
+                                        <a href="/raw/{{ document|encode_doc }}?rev={{ rev }}" class="dropdown-item">RAW</a>
+                                        <!-- <a href="//{{ document|encode_doc }}" class="dropdown-item">Blame</a> -->
+                                        <a href="/diff/{{ document|encode_doc }}?rev={{ rev }}&oldrev={{ rev - 1 }}" class="dropdown-item">이전 리비전과 비교</a>
+                                        <a href="/revert/{{ document|encode_doc }}?rev={{ rev }}" class="dropdown-item">이 리버전으로 되돌리기</a>
+                                    {% else %}
+                                        <a href="/raw/{{ document|encode_doc }}" class="dropdown-item">RAW</a>
+                                        <!-- <a href="//{{ document|encode_doc }}" class="dropdown-item">Blame</a> -->
+                                        <a href="/diff/{{ document|encode_doc }}" class="dropdown-item">이전 리비전과 비교</a>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                            {% if skinInfo.viewName == 'edit' %}
+                                <a href="/backlink/{{ document|encode_doc }}" class="btn btn-secondary tools-btn">역링크</a>
+                                <a href="/delete/{{ document|encode_doc }}" class="btn btn-danger tools-btn">삭제</a>
+                                <a href="/move/{{ document|encode_doc }}" class="btn btn-secondary tools-btn">이동</a>
+                            {% elseif skinInfo.viewName == 'xref' %}
+                                <a href="/edit/{{ document|encode_doc }}" class="btn btn-secondary tools-btn">편집</a>
+                                <a href="/history/{{ document|encode_doc }}" class="btn btn-secondary tools-btn">역사</a>
+                            {% elseif skinInfo.viewName == 'history' %}
+                                <a href="/backlink/{{ document|encode_doc }}" class="btn btn-secondary tools-btn">역링크</a>
+                                <a href="/edit/{{ document|encode_doc }}" class="btn btn-secondary tools-btn">편집</a>
+                            {% elseif skinInfo.viewName == 'thread' %}
+                                <a href="/discuss/{{ document|encode_doc }}" class="btn btn-secondary tools-btn">토론</a>
+                            {% elseif skinInfo.viewName == 'raw' || skinInfo.viewName == 'blame' || skinInfo.viewName == 'diff' %}
+                                <a href="/w/{{ document|encode_doc }}?rev={{ rev }}" class="btn btn-secondary tools-btn">보기</a>
+                                <a href="/edit/{{ document|encode_doc }}" class="btn btn-secondary tools-btn">편집</a>
+                                <a href="/history/{{ document|encode_doc }}" class="btn btn-secondary tools-btn">역사</a>
+                            {% elseif skinInfo.viewName == 'contribution' || skinInfo.viewName == 'contribution_discuss' %}
+                                <a href="/w/{{ document|encode_doc }}" class="btn btn-secondary tools-btn">사용자 문서</a>
+                                {% if perms.has('aclgroup') %}
+                                    <a href="#" class="btn btn-danger tools-btn">차단</a>
+                                {% endif %}
+                            {% endif %}
+                            </div>
+                        </div>
+                {% endif %}
+                <div class="title">
+                    <h1 id="main_title">
+                        {% if document %}
+                            {% if document.namespace != '문서' || document.forceShowNamespace %}
+                                <a href="/w/{{ document|encode_doc }}"><span class="namespace">{{ document.namespace }}:</span>{{ document.title }}</a>
+                            {% else %}
+                                <a href="/w/{{ document|encode_doc }}">{{ document.title }}</a>
+                            {% endif %}
+                        {% else %}
+                            {{ skinInfo.title }}
+                        {% endif %} 
+
+                        {% if skinInfo.viewName == 'edit_edit_request' || skinInfo.viewName == 'edit_request' %}
+                            <small>(편집 요청)</small>
+                        {% elseif skinInfo.viewName == 'edit' && body.section %}
+                            <small>(r{{ body.baserev }} 문단 편집)</small>
+                        {% elseif skinInfo.viewName == 'edit' && body.baserev === '0' %}
+                            <small>(새 문서 생성)</small>
+                        {% elseif skinInfo.viewName == 'edit' %}
+                            <small>(편집)</small>
+                        {% elseif skinInfo.viewName == 'thread' %}
+                            <small>(토론)</small>
+                        {% elseif skinInfo.viewName == 'thread_list' %}
+                            <small>(토론)</small>
+                        {% elseif skinInfo.viewName == 'thread_list_close' %}
+                            <small>(닫힌 토론)</small>
+                        {% elseif skinInfo.viewName == 'edit_request_list_close' %}
+                            <small>(닫힌 편집 요청)</small>
+                        {% elseif skinInfo.viewName == 'xref' %}
+                            <small>(역링크)</small>
+                        {% elseif skinInfo.viewName == 'history' %}
+                            <small>(문서 역사)</small>
+                        {% elseif skinInfo.viewName == 'move' %}
+                            <small>(이동)</small>
+                        {% elseif skinInfo.viewName == 'delete' %}
+                            <small>(삭제)</small>
+                        {% elseif skinInfo.viewName == 'diff' %}
+                            <small>(비교)</small>
+                        {% elseif skinInfo.viewName == 'acl' %}
+                            <small>(ACL)</small>
+                        {% elseif skinInfo.viewName == 'blame' && rev %}
+                            <small>(r{{ rev }} Blame)</small>
+                        {% elseif skinInfo.viewName == 'raw' && rev %}
+                            <small>(r{{ rev }} RAW)</small>
+                        {% elseif skinInfo.viewName == 'revert' && rev %}
+                            <small>(r{{ rev }}로 되돌리기)</small>
+                        {% elseif skinInfo.viewName == 'wiki' && rev %}
+                            <small>(r{{ rev }} 판)</small>
+                        {% endif %}
+                    </h1>
+                </div>
+            </div>
+            <div class="liberty-content-main wiki-article">
+                <div id="editable" class="alert alert-danger" role="alert" style="display: none;">
+                    <button type="button" onclick="$(this).parent().hide()" class="close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <span>{{ edit_acl_message|safe }}</span>
+                    {% if editable === true && edit_acl_message %}
+                        <span>대신 <a href="/new_edit_request/{{ document|encode_doc }}">편집 요청</a>을 생성할 수 있습니다.</span>
+                    {% endif %}
+                </div>
+                {% if user_document_discuss %}
+                    <div class="alert alert-info fade in" id="userDiscussAlert" role="alert" data-id="{{ member.username }}-{{ user_document_discuss }}">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        [<span class="fa fa-bell"></span> <b>알림</b>] 현재 진행 중인 <a href="/discuss/{{ member.username | encode_userdoc }}"><span class="fa fa-commenting"></span> <b>사용자 토론</b></a>이 있습니다.
+                    </div>
+                {% endif %}
+                {% if skinInfo.viewName == 'notfound' %}
+                <div class="alert alert-info" role="alert">
+                    <p style="margin-bottom: -25px !important; margin-top: 5px !important;">'{{ skinInfo.title }}'을(를) 검색하시겠습니까?</p>
+                    <div class="float-right"><a href="/search/{{ skinInfo.title }}" class="btn btn-secondary btn-sm">검색</a></div>
+                    <div class="clearfix"></div>
+                </div>
+                {% endif %}
+                {% block content %}
+                {% endblock %}
+            </div>
+            <div class="liberty-footer" id="bottom">
+                {% if skinInfo.viewName == 'wiki' and date %}
+                <ul class="footer-info">
+                    <li class="footer-info-lastmod"> 이 문서는 {{ date | to_date | localdate('Y-m-d H:i:sO') }} 에 마지막으로 바뀌었습니다.</li>
+                    <li class="footer-info-copyright">{{ config.getString('wiki.copyright_text', '') }}</li>
+                </ul>
+                {% endif %}
+                <ul class="footer-places">
+                    {{ config.getString('skin.liberty.footer_html','')|safe }}
+                </ul>
+                <ul class="footer-icons">
+                    <li class="footer-poweredbyico">
+                        <a href="//github.com/SomniumDev/haneul-liberty">haneul-liberty</a> | haneul-seed (Adapted from <a href="//github.com/gdl-blue/imitated-seed-2/">imitated seed</a>)
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="footnoteModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">각주:</h5>
+                </div>
+                <div class="modal-body"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-block" data-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="scroll-buttons">
+        <a class="scroll-toc" href="#toc"><i class="fa fa-list-alt" aria-hidden="true"></i></a>
+        <a class="scroll-button" href="#top" id="left"><i class="fa fa-arrow-up" aria-hidden="true"></i></a>
+        <a class="scroll-bottom" href="#bottom" id="right"><i class="fa fa-arrow-down" aria-hidden="true"></i></a>
+    </div>
+</div>
