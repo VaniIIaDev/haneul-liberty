@@ -1,4 +1,4 @@
-하늘위키에서 사용 중인 imitated-skin-liberty의 개조판.
+하늘위키, ~~루다위키(구버젼)~~에서 사용 중인 imitated-skin-liberty의 개조판.
 <br>haneul-seed 외 타 엔진 사용은 호환성이 엉망이고 검증되지 않았으므로 비추천함.<br><br>
 
 아래는 원본 설명.
