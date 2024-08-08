@@ -1,3 +1,7 @@
+하늘위키에서 사용 중인 imitated-skin-liberty의 개조판.
+
+
+
 ## Liberty Skin on imitated-seed engine
 **Powered by [imitated-seed-2](https://github.com/gdl-blue/imitated-seed-2)**  
 Recommended setting "theseed_version" to "4.22.7^"
