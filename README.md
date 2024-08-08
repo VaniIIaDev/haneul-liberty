@@ -1,7 +1,7 @@
 하늘위키에서 사용 중인 imitated-skin-liberty의 개조판.
-haneul-seed 외 타 엔진 사용은 호환성이 엉망이고 검증되지 않았으므로 비추천함.
+<br>haneul-seed 외 타 엔진 사용은 호환성이 엉망이고 검증되지 않았으므로 비추천함.<br><br>
 
-
+아래는 원본 설명.
 ## Liberty Skin on imitated-seed engine
 **Powered by [imitated-seed-2](https://github.com/gdl-blue/imitated-seed-2)**  
 Recommended setting "theseed_version" to "4.22.7^"
